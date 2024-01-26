@@ -32,7 +32,7 @@ class checker_texture : public texture {
     checker_texture(double _scale, color c1, color c2)
       : inv_scale(1.0 / _scale),
         even(make_shared<solid_color>(c1)),
-        odd(make_shared<solid_color>(c2)),
+        odd(make_shared<solid_color>(c2))
     {}
 
     color value(double u, double v, const point3& p) const override {
