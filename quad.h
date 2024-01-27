@@ -13,6 +13,7 @@ class quad : public hittable {
         auto n = cross(u, v);
         normal = unit_vector(n);
         D = dot(normal, Q);
+        w = n / dot(n,n);
 
         set_bounding_box();
     }
@@ -52,6 +53,7 @@ class quad : public hittable {
     aabb bbox;
     vec3 normal;
     double D;
+    vec3 w;
 };
 
 #endif
