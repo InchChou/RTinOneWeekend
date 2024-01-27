@@ -36,13 +36,33 @@ class quad : public hittable {
         if (!ray_t.contains(t))
             return false;
 
+        // Determine the hit point lies within the planar shape using its plane coordinates.
         auto intersection = r.at(t);
+        vec3 planar_hitpt_vector = intersection - Q;
+        auto alpha = dot(w, cross(planar_hitpt_vector, v));
+        auto beta = dot(w, cross(u, planar_hitpt_vector));
 
+        if (!is_interior(alpha, beta, rec))
+            return false;
+
+        // Ray hits the 2D shape; set the rest of the hit record and return true.
         rec.t = t;
         rec.p = intersection;
         rec.mat = mat;
         rec.set_face_normal(r, normal);
 
+        return true;
+    }
+
+    virtual bool is_interior(double a, double b, hit_record& rec) const {
+        // Given the hit point in plane coordinates, return false if it is outside the
+        // primitive, otherwise set the hit record UV coordinates and return true.
+
+        if ((a < 0) || (1 < a) || (b < 0) || (1 < b))
+            return false;
+
+        rec.u = a;
+        rec.v = b;
         return true;
     }
 
