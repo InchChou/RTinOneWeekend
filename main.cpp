@@ -379,17 +379,20 @@ void final_scene(int image_width, int samples_per_pixel, int max_depth) {
     cam.render(world);
 }
 
+#include <iostream>
+#include <iomanip>
+#include <math.h>
+#include <stdlib.h>
+
 int main(int argc, char** argv) {
-    switch (0) {
-        case 1:  random_spheres();            break;
-        case 2:  two_spheres();               break;
-        case 3:  earth();                     break;
-        case 4:  two_perlin_spheres();        break;
-        case 5:  quads();                     break;
-        case 6:  simple_light();              break;
-        case 7:  cornell_box();               break;
-        case 8:  cornell_smoke();             break;
-        case 9:  final_scene(800, 10000, 40); break;
-        default: final_scene(400,   250,  4); break;
+    int N = 100000;
+    int inside_circle = 0;
+    for (int i = 0; i < N; i++) {
+        auto x = random_double(-1,1);
+        auto y = random_double(-1,1);
+        if (x*x + y*y < 1)
+            inside_circle++;
     }
+    std::cout << std::fixed << std::setprecision(12);
+    std::cout << "Estimate of Pi = " << (4.0 * inside_circle) / N << '\n';
 }
