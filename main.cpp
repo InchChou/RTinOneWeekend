@@ -385,14 +385,19 @@ void final_scene(int image_width, int samples_per_pixel, int max_depth) {
 #include <stdlib.h>
 
 int main(int argc, char** argv) {
-    int N = 100000;
     int inside_circle = 0;
-    for (int i = 0; i < N; i++) {
+    int runs = 0;
+    std::cout << std::fixed << std::setprecision(12);
+    while (true) {
+        runs++;
         auto x = random_double(-1,1);
         auto y = random_double(-1,1);
         if (x*x + y*y < 1)
             inside_circle++;
+
+        if (runs % 100000 == 0)
+            std::cout << "Estimate of Pi = "
+                      << (4.0 * inside_circle) / runs
+                      << '\n';
     }
-    std::cout << std::fixed << std::setprecision(12);
-    std::cout << "Estimate of Pi = " << (4.0 * inside_circle) / N << '\n';
 }
