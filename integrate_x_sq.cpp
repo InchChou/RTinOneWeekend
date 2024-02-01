@@ -5,15 +5,21 @@
 #include <math.h>
 #include <stdlib.h>
 
+double f(double d) {
+    return 8.0 * pow(d, 1.0/3.0);
+}
+
+double pdf(double x) {
+    return (3.0/8.0) * x*x;
+}
+
 int main() {
-    int a = 0;
-    int b = 2;
-    int N = 1000000;
+    int N = 1;
     auto sum = 0.0;
     for (int i = 0; i < N; i++) {
-        auto x = random_double(a, b);
-        sum += log(sin(x));
+        auto x = f(random_double(0.000001, 1));
+        sum += x*x / pdf(x);
     }
     std::cout << std::fixed << std::setprecision(12);
-    std::cout << "I = " << (b - a) * (sum / N) << '\n';
+    std::cout << "I = " << sum / N << '\n';
 }
