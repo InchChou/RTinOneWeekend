@@ -4,6 +4,7 @@
 #include "rtweekend.h"
 
 #include "onb.h"
+#include "hittable_list.h"
 
 
 class pdf {
@@ -42,6 +43,25 @@ class cosine_pdf : public pdf {
 
   private:
     onb uvw;
+};
+
+class hittable_pdf : public pdf {
+  public:
+    hittable_pdf(const hittable& _objects, const point3& _origin)
+      : objects(_objects), origin(_origin)
+    {}
+
+    double value(const vec3& direction) const override {
+        return objects.pdf_value(origin, direction);
+    }
+
+    vec3 generate() const override {
+        return objects.random(origin);
+    }
+
+  private:
+    const hittable& objects;
+    point3 origin;
 };
 
 #endif
