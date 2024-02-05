@@ -7,6 +7,14 @@
 
 class hit_record;
 
+class scatter_record {
+  public:
+    color attenuation;
+    shared_ptr<pdf> pdf_ptr;
+    bool skip_pdf;
+    ray skip_pdf_ray;
+};
+
 class material {
   public:
     virtual ~material() = default;
@@ -18,7 +26,10 @@ class material {
     }
 
     virtual bool scatter(
-        const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered, double& pdf) const = 0;
+        const ray& r_in, const hit_record& rec, scatter_record& srec
+        ) const {
+            return false;
+        }
 
     virtual double scattering_pdf(const ray& r_in, const hit_record& rec, const ray& scattered)
     const {
@@ -31,25 +42,17 @@ class lambertian : public material {
     lambertian(const color& a) : albedo(make_shared<solid_color>(a)) {}
     lambertian(shared_ptr<texture> a) : albedo(a) {}
 
-    bool scatter(const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered, double& pdf)
-    const override {
-        onb uvw;
-        uvw.build_from_w(rec.normal);
-        auto scatter_direction = uvw.local(random_cosine_direction());
-
-        // Catch degenerate scatter direction
-        if (scatter_direction.near_zero())
-            scatter_direction = rec.normal;
-
-        scattered = ray(rec.p, scatter_direction, r_in.time());
-        attenuation = albedo->value(rec.u, rec.v, rec.p);
-        pdf = dot(uvw.w(), scattered.direction()) / pi;
+    bool scatter(const ray& r_in, const hit_record& rec, scatter_record& srec) const override {
+        srec.attenuation = albedo->value(rec.u, rec.v, rec.p);
+        srec.pdf_ptr = make_shared<cosine_pdf>(rec.normal);
+        srec.skip_pdf = false;
         return true;
     }
 
     double scattering_pdf(const ray& r_in, const hit_record& rec, const ray& scattered)
     const override {
-        return 1 / (2*pi);
+        auto cosine = dot(rec.normal, unit_vector(scattered.direction()));
+        return cosine < 0 ? 0 : cosine/pi;
     }
 
   private:
@@ -135,11 +138,10 @@ class isotropic : public material {
     isotropic(color c) : albedo(make_shared<solid_color>(c)) {}
     isotropic(shared_ptr<texture> a) : albedo(a) {}
 
-    bool scatter(const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered, double& pdf)
-    const override {
-        scattered = ray(rec.p, random_unit_vector(), r_in.time());
-        attenuation = albedo->value(rec.u, rec.v, rec.p);
-        pdf = 1 / (4 * pi);
+    bool scatter(const ray& r_in, const hit_record& rec, scatter_record& srec) const override {
+        srec.attenuation = albedo->value(rec.u, rec.v, rec.p);
+        srec.pdf_ptr = make_shared<sphere_pdf>();
+        srec.skip_pdf = false;
         return true;
     }
 
