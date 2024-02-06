@@ -6,7 +6,6 @@
 #include "color.h"
 #include "hittable.h"
 #include "material.h"
-#include "pdf.h"
 
 #include <iostream>
 
