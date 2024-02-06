@@ -2,11 +2,9 @@
 #define MATERIAL_H
 
 #include "rtweekend.h"
-#include "texture.h"
-#include "onb.h"
-#include "pdf.h"
 
-class hit_record;
+#include "texture.h"
+#include "pdf.h"
 
 class scatter_record {
   public:
@@ -52,8 +50,8 @@ class lambertian : public material {
 
     double scattering_pdf(const ray& r_in, const hit_record& rec, const ray& scattered)
     const override {
-        auto cosine = dot(rec.normal, unit_vector(scattered.direction()));
-        return cosine < 0 ? 0 : cosine/pi;
+        auto cosine_theta = dot(rec.normal, unit_vector(scattered.direction()));
+        return cosine_theta < 0 ? 0 : cosine_theta/pi;
     }
 
   private:
