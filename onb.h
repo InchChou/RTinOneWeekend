@@ -32,7 +32,7 @@ class onb {
         axis[2] = unit_w;
     }
 
-  public:
+  private:
     vec3 axis[3];
 };
 
