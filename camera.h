@@ -120,6 +120,12 @@ class camera {
         return (px * pixel_delta_u) + (py * pixel_delta_v);
     }
 
+    vec3 pixel_sample_disk(double radius) const {
+        // Generate a sample from the disk of given radius around a pixel at the origin.
+        auto p = radius * random_in_unit_disk();
+        return (p[0] * pixel_delta_u) + (p[1] * pixel_delta_v);
+    }
+
     point3 defocus_disk_sample() const {
         // Returns a random point in the camera defocus disk.
         auto p = random_in_unit_disk();
