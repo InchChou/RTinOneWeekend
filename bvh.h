@@ -10,12 +10,16 @@
 
 class bvh_node : public hittable {
   public:
-    bvh_node(const hittable_list& list) : bvh_node(list.objects, 0, list.objects.size()) {}
+    bvh_node(hittable_list& list) : bvh_node(list.objects, 0, list.objects.size()) {
+        // There's a C++ subtlety here. This constructor (without span indices) creates an
+        // implicit copy of the hittable list, which we will modify. The lifetime of the copied
+        // list only extends until this constructor exits. That's OK, because we only need to
+        // persist the resulting bounding volume hierarchy.
+    }
 
-    bvh_node(const std::vector<shared_ptr<hittable>>& src_objects, size_t start, size_t end) {
-        auto objects = src_objects; // Create a modifiable array of the source scene objects
-
+    bvh_node(std::vector<shared_ptr<hittable>>& objects, size_t start, size_t end) {
         int axis = random_int(0,2);
+
         auto comparator = (axis == 0) ? box_x_compare
                         : (axis == 1) ? box_y_compare
                                       : box_z_compare;
@@ -25,13 +29,8 @@ class bvh_node : public hittable {
         if (object_span == 1) {
             left = right = objects[start];
         } else if (object_span == 2) {
-            if (comparator(objects[start], objects[start+1])) {
-                left = objects[start];
-                right = objects[start+1];
-            } else {
-                left = objects[start+1];
-                right = objects[start];
-            }
+            left = objects[start];
+            right = objects[start+1];
         } else {
             std::sort(objects.begin() + start, objects.begin() + end, comparator);
 
